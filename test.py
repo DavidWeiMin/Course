@@ -1,28 +1,26 @@
-# from docplex.mp.model import Model
-# model = Model('Column generation')
-# a = [[1,0,0],[0,1,0],[0,0,1]]
-# c = [1] * 3
-# rhs = [44,3,48]
-# x = model.continuous_var_list(3,0,name='x')
-# print(model)
-# model.clear()
-# x = model.continuous_var_list(3,0,name='x')
-# print(model)
-# cts = []
-# for i in range(3):
-#     ct = model.add_constraint(model.dot(x,a[i]) <= rhs[i])
-#     cts.append(ct)
-# model.maximize(model.dot(x,c))
-# model.solve()
-# dual = model.dual_values(cts)
-# a = model.solution.get_all_values()
-# print(a)
-def f():
-    return break
+from docplex.mp.model import Model
+import numpy as np
+from knapsack import Knapsack
+model = Model('Column generation')
+W = 218
+w = [81,70,68]
+c = [1,1,1,1,1,1]
+a = np.array([[1,0,0,0,1,2],[0,1,0,3,0,0],[0,0,1,0,2,0]])
+rhs = [44,3,48]
+x = model.continuous_var_list(len(c),0,name='x')
+cons = []
+for i in range(len(a[:,0])):
+    cons.append(model.add_constraint(model.dot(x,a[i,:])>=rhs[i]))
+model.minimize(model.sum(x))
+model.solve()
+print(model.objective_value)
+print(model.dual_values(cons))
+print(model.solution.get_all_values())
+knapsack = Knapsack(W,w,model.dual_values(cons))
+print(knapsack.solution)
+print(knapsack.track)
 
-for i in range(10):
-    if i < 7:
-        print(i)
-    else:
-        f()
+
+
+
 

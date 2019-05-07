@@ -1,13 +1,3 @@
-# code must be tested by the following examples:
-# W = 12, w1 = 1, w2 = 2, n1 = 6, n2 = 3
-# W = 12, w1 = 1, w2 = 2, n1 = 4, n2 = 4
-# W = 1200, w1 = 10, w2 = 20, n1 = 60, n2 = 30
-# W = 1200, w1 = 10, w2 = 20, n1 = 40, n2 = 40
-# W = 100, w1 = 11, w2 = 41, n1 = 73, n2 = 13
-# W = 100, w1 = 23, w2 = 29, n1 = 43, n2 = 43
-# W = 100, w1 = 23, w2 = 29, n1 = 73, n2 =13
-# W = 100, w1 = 11, w2 = 41, n1 = 43, n2 = 43
-
 from docplex.mp.model import Model
 import numpy as np
 from knapsack import Knapsack
@@ -16,12 +6,12 @@ class Column_generation():
 
     def __init__(self):
 
-        # self.W = 100
-        # self.w = [2 ** i for i in range(7)]
-        # self.demand = range(1,8)
-        self.W = 600
-        self.w = np.random.randint(10,200,80)
-        self.demand = np.random.randint(10,200,80)
+        self.W = 218
+        self.w = [81,70,68]
+        self.demand = [44,3,48]
+        # self.W = 600
+        # self.w = np.random.randint(10,200,80)
+        # self.demand = np.random.randint(10,200,80)
         self.m = len(self.w)
         self.col_num = self.m
 
@@ -40,6 +30,7 @@ class Column_generation():
         self.objective = model.objective_value
         self.dual = model.dual_values(constraints)
         self.descent = True
+        self.substitute_col_num = 0
 
 
     def rlpm(self,flag=None):
@@ -60,35 +51,40 @@ class Column_generation():
         else:
             return False
     
-    def add_col(self,col):
-        self.a = np.c_[self.a,col]
+    def substitute_col(self,col):
+        theta = np.zeros(self.m)
+        for i in range(self.m):
+            if col[i] > 0:
+                theta[i] = self.demand[i] / col[i]
+            else:
+                theta[i] = float('inf')
+        out_basis = np.argmin(theta)
+        self.a[:,out_basis] = col
+        self.substitute_col_num += 1
 
     def run(self):
-        print_num = 0
         self.initial()
         while 1:
             if self.descent:
                 knapsack = Knapsack(self.W,self.w,self.dual)
                 if knapsack.solution > 1:
-                    self.add_col(knapsack.track)
-                    self.col_num += 1
-                    if self.col_num > 200:
-                        if print_num == 0:
-                            print('too much column')
-                            print(self.w)
-                            print('='*20)
-                            print(self.demand)
-                            print_num = 1
+                    self.substitute_col(knapsack.track)
                 else:
                     self.rlpm(flag=1)
+                    print(self.substitute_col_num)
+                    print(self.objective)
+                    print(self.dual)
                     return self.a,self.prime
             else:
                 self.rlpm(flag=1)
+                print(self.substitute_col_num)
+                print(self.objective)
+                print(self.dual)
                 return self.a,self.prime
             self.descent = self.rlpm()
 
 if __name__=='__main__':
     column_generation = Column_generation()
     a,x = column_generation.run()
-    print(a.shape)
+    print(a)
     print(x)
