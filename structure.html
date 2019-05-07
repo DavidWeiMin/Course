@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <pre><code class="language-mermaid"><div>graph TB;
+start((initial)) --&gt; process1[solve RLPM];
+process1[solve RLPM] --&gt; value1[pass in dual variables and objective];
+value1[pass in dual variables and objective] --&gt; condition1{objective descents ?};
+condition1{objective descents ?} --No--&gt; stop((stop));
+condition1{objective descents ?} --Yes--&gt; process2[pass in dual variables and solve knapsack problem];
+process2[pass in dual variables and solve knapsack problem] --&gt; value2[pass out decision variables and objective of knapsack problem];
+value2[pass out decision variables and objective of knapsack problem] --&gt; condition2{objective of knapsack problem &gt; 1?};
+condition2{objective of knapsack problem &gt; 1?} --No--&gt; stop((stop));
+condition2{objective of knapsack problem &gt; 1?} --Yes--&gt; process3[pass in decision variables of knapsack problem as column added into RLPM];
+process3[pass in decision variables of knapsack problem as column added into RLPM] --&gt; process1[solve RLPM];
+</div></code></pre>
+
+    </body>
+    </html>

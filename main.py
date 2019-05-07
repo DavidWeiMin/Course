@@ -16,10 +16,10 @@ class Column_generation():
 
     def __init__(self):
 
-        # self.W = 1200
-        # self.w = [17,15,16,69,74,46,33,57,22,80]
-        # self.demand = [22,25,12,8,13,31,4,8,9,10]
-        self.W = 300
+        # self.W = 100
+        # self.w = [2 ** i for i in range(7)]
+        # self.demand = range(1,8)
+        self.W = 600
         self.w = np.random.randint(10,200,80)
         self.demand = np.random.randint(10,200,80)
         self.m = len(self.w)
@@ -27,7 +27,6 @@ class Column_generation():
 
     
     def initial(self):
-        # self.a = np.identity(self.m)
         self.a = np.zeros((self.m,self.col_num))
         for i in range(self.m):
             self.a[i,i] = int(self.W / self.w[i])
@@ -44,7 +43,6 @@ class Column_generation():
 
 
     def rlpm(self,flag=None):
-        # self.model.clear()
         model = Model('RLPM')
         x = model.continuous_var_list(self.col_num,0,name='x')
         constraints = []
@@ -55,7 +53,7 @@ class Column_generation():
         objective = model.objective_value
         if flag:
             self.prime = model.solution.get_all_values()
-        if objective < self.objective:
+        if objective < self.objective - 1e-3:
             self.objective = objective
             self.dual = model.dual_values(constraints)
             return True
@@ -66,6 +64,7 @@ class Column_generation():
         self.a = np.c_[self.a,col]
 
     def run(self):
+        print_num = 0
         self.initial()
         while 1:
             if self.descent:
@@ -73,6 +72,13 @@ class Column_generation():
                 if knapsack.solution > 1:
                     self.add_col(knapsack.track)
                     self.col_num += 1
+                    if self.col_num > 200:
+                        if print_num == 0:
+                            print('too much column')
+                            print(self.w)
+                            print('='*20)
+                            print(self.demand)
+                            print_num = 1
                 else:
                     self.rlpm(flag=1)
                     return self.a,self.prime
