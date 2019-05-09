@@ -23,7 +23,7 @@ class Knapsack():
         self.v = v
     
     @property # 属性修饰器
-    def solution(self):
+    def objective(self):
         """求解背包能装下的最大总价值
         
         Returns:
@@ -40,7 +40,7 @@ class Knapsack():
         return max(self.V[-1])
     
     @property
-    def track(self):
+    def solution(self):
         """[返回最优时每个物品的装载量]
         
         Returns:
@@ -58,7 +58,6 @@ class Knapsack():
  
 if __name__ == '__main__':
     # 测试
-    knapsack = Knapsack(56000,[138,152,156,171,182,188,193,200,205,210,214,215,220],[22,25,12,14,18,18,20,10,12,14,16,18,20])
+    knapsack = Knapsack(10,[3,2,5,1,6,4],[6,5,10,2,16,8])
+    print(knapsack.objective)
     print(knapsack.solution)
-    print(knapsack.track)
-    pass

@@ -7,8 +7,8 @@ class Column_generation():
     def __init__(self):
 
         self.W = 218
-        self.w = [81,70,68]
-        self.demand = [44,3,48]
+        self.w = [81,70,68,77,33,9,86,55,74,83]
+        self.demand = [44,3,48,12,22,17,31,23,8,11]
         # self.W = 600
         # self.w = np.random.randint(10,200,80)
         # self.demand = np.random.randint(10,200,80)
@@ -20,36 +20,20 @@ class Column_generation():
         self.a = np.zeros((self.m,self.col_num))
         for i in range(self.m):
             self.a[i,i] = int(self.W / self.w[i])
-        model = Model('RLPM')
-        x = model.continuous_var_list(self.col_num,0,name='x')
-        constraints = []
-        for i in range(self.m):
-            constraints.append(model.add_constraint(model.dot(x,self.a[i,:]) >= self.demand[i]))
-        model.minimize(model.dot(x,[1]*self.col_num))
-        model.solve()
-        self.objective = model.objective_value
-        self.dual = model.dual_values(constraints)
-        self.descent = True
         self.substitute_col_num = 0
 
 
-    def rlpm(self,flag=None):
+    def rlpm(self):
         model = Model('RLPM')
         x = model.continuous_var_list(self.col_num,0,name='x')
         constraints = []
         for i in range(self.m):
             constraints.append(model.add_constraint(model.dot(x,self.a[i,:]) >= self.demand[i]))
-        model.minimize(model.dot(x,[1]*self.col_num))
+        model.minimize(model.sum(x))
         model.solve()
-        objective = model.objective_value
-        if flag:
-            self.prime = model.solution.get_all_values()
-        if objective < self.objective - 1e-3:
-            self.objective = objective
-            self.dual = model.dual_values(constraints)
-            return True
-        else:
-            return False
+        self.prime = model.solution.get_all_values()
+        self.objective = model.objective_value
+        self.dual = model.dual_values(constraints)
     
     def substitute_col(self,col):
         theta = np.zeros(self.m)
@@ -65,23 +49,15 @@ class Column_generation():
     def run(self):
         self.initial()
         while 1:
-            if self.descent:
-                knapsack = Knapsack(self.W,self.w,self.dual)
-                if knapsack.solution > 1:
-                    self.substitute_col(knapsack.track)
-                else:
-                    self.rlpm(flag=1)
-                    print(self.substitute_col_num)
-                    print(self.objective)
-                    print(self.dual)
-                    return self.a,self.prime
+            self.rlpm()
+            knapsack = Knapsack(self.W,self.w,self.dual)
+            if knapsack.objective > 1:
+                self.substitute_col(knapsack.solution)
             else:
-                self.rlpm(flag=1)
                 print(self.substitute_col_num)
                 print(self.objective)
                 print(self.dual)
                 return self.a,self.prime
-            self.descent = self.rlpm()
 
 if __name__=='__main__':
     column_generation = Column_generation()
