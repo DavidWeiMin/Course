@@ -9,9 +9,6 @@ class Column_generation():
         self.W = 218
         self.w = [81,70,68,77,33,9,86,55,74,83]
         self.demand = [44,3,48,12,22,17,31,23,8,11]
-        # self.W = 600
-        # self.w = np.random.randint(10,200,80)
-        # self.demand = np.random.randint(10,200,80)
         self.m = len(self.w)
         self.col_num = self.m
 
@@ -25,7 +22,7 @@ class Column_generation():
 
     def rlpm(self):
         model = Model('RLPM')
-        x = model.continuous_var_list(self.col_num,0,name='x')
+        x = model.continuous_var_list(len(self.a[0]),0,name='x')
         constraints = []
         for i in range(self.m):
             constraints.append(model.add_constraint(model.dot(x,self.a[i,:]) >= self.demand[i]))
@@ -35,7 +32,7 @@ class Column_generation():
         self.objective = model.objective_value
         self.dual = model.dual_values(constraints)
     
-    def substitute_col(self,col):
+    def add_col(self,col):
         self.a = np.c_[self.a,col]
 
     def run(self):
@@ -44,11 +41,9 @@ class Column_generation():
             self.rlpm()
             knapsack = Knapsack(self.W,self.w,self.dual)
             if knapsack.objective > 1:
-                self.substitute_col(knapsack.solution)
+                self.add_col(knapsack.solution)
             else:
-                print(self.substitute_col_num)
                 print(self.objective)
-                print(self.dual)
                 return self.a,self.prime
 
 if __name__=='__main__':
