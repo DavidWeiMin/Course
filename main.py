@@ -36,15 +36,7 @@ class Column_generation():
         self.dual = model.dual_values(constraints)
     
     def substitute_col(self,col):
-        theta = np.zeros(self.m)
-        for i in range(self.m):
-            if col[i] > 0:
-                theta[i] = self.demand[i] / col[i]
-            else:
-                theta[i] = float('inf')
-        out_basis = np.argmin(theta)
-        self.a[:,out_basis] = col
-        self.substitute_col_num += 1
+        self.a = np.c_[self.a,col]
 
     def run(self):
         self.initial()
