@@ -54,10 +54,12 @@ class Knapsack():
                     x[i-1] += 1
                     c = c - self.w[i - 1]
                     break
+            else:#最小重量的物品的价值可能为0
+                break
         return x
  
 if __name__ == '__main__':
     # 测试
-    knapsack = Knapsack(10,[3,2,5,1,6,4],[6,5,10,2,16,8])
+    knapsack = Knapsack(218,[70, 68, 77, 33, 9, 86, 55, 74],[0.3333333333333333, 0.3333333333333333, 0.375, 0.125, 0, 0.5, 0.25, 0.375])
     print(knapsack.objective)
     print(knapsack.solution)
